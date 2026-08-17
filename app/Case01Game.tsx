@@ -231,8 +231,47 @@ export default function Case01Game() {
       else if(id==="dorm-key"&&s===8){o.visible=false;addItem("女子宿舍钥匙");setStep(9);flash("获得：女子宿舍 3-B 钥匙")}
       else if(id==="dorm-door"&&s===9){doorOpen=true;o.visible=false;setStep(10);camera.position.set(0,1.65,-14);say("四张床。四张照片。四个名字。")}
       else if(id.startsWith("doll-")&&s===10){const n=Number(id.split("-")[1]);if(n!==dolls){say("位置不对。发卡、香水、画册、学生证……顺序应当对应床铺。",2500);return}o.position.set((n%2?-1:1)*4,1.35,-16-Math.floor(n/2)*5);dolls++;flash(`娃娃归位 ${dolls} / 4`);if(dolls===4){ambient.intensity=.05;redLight.intensity=2.2;say("一个姑娘照镜子，镜里坐着一个她。少一个，又来一个。哪一个才是真的？",6200);later(()=>{fifth.visible=true;ambient.intensity=.24;redLight.intensity=.45;setStep(11)},2600)}}
-      else if(id==="fifth-doll"&&s===11){say("它没有姓名牌。校服内侧却缝着：20011128。",4200);later(()=>{fifth.visible=false;setStep(12);(mirror.material as THREE.Material).dispose();mirror.material=mirrorMat;mirror.userData.label="掀开蒙布"},1500)}
-      else if(id==="mirror"&&s===12){mirror.material=mirrorMat;setStep(13);say("镜中是一个普通女生。至少……现在是。",3800)}
+      else if(id==="fifth-doll"&&s===11){
+  say(
+    "它没有姓名牌。校服内侧却缝着：20011128。",
+    4200
+  );
+
+  later(()=>{
+    fifth.visible=false;
+    setStep(12);
+
+    const mirrorMesh = mirror as THREE.Mesh;
+
+    if(mirrorMesh.material){
+      if(Array.isArray(mirrorMesh.material)){
+        mirrorMesh.material.forEach(m=>m.dispose());
+      }else{
+        mirrorMesh.material.dispose();
+      }
+    }
+
+    mirrorMesh.material = mirrorMat;
+
+    mirror.userData.label="掀开蒙布";
+
+  },1500);
+}
+
+else if(id==="mirror"&&s===12){
+
+  const mirrorMesh = mirror as THREE.Mesh;
+
+  mirrorMesh.material = mirrorMat;
+
+  setStep(13);
+
+  say(
+    "镜中是一个普通女生。至少……现在是。",
+    3800
+  );
+
+}
       else if(id==="mirror"&&s===13){locked=false;document.exitPointerLock();redLight.intensity=5;ambient.intensity=0;flashlight.intensity=.2;say("镜像慢了半秒。她的左眼下……有一颗痣。",4300);later(()=>setMode("ending"),3900)}
       else wrong();
     }
